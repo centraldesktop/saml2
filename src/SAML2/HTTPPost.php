@@ -67,7 +67,20 @@ class SAML2_HTTPPost extends SAML2_Binding
 
         $msg = base64_decode($msg);
 
+
         SAML2_Utils::getContainer()->debugMessage($msg, 'in');
+
+	
+        // PHP c14n doesn't normalize to the same spec as ADFS,
+        // in fact it eats \r so this can't be done AFTER this is parsed into the DOM document space
+        // Ff there is a \r\n in one of the the claim rules / attribute statements
+        // validation will fail.  The spec makes mention of the \n => $xA rule a lot
+        // but there isn't much mention of the \r -> #xD rule which is apparently
+        // something ADFS does.  Do this too.
+        // This is a mega hack, this library is no longer being manintained,
+        // look at checking this behavior in the "new" upstream for simplesaml/saml2
+        // which is apparently ass/XmlSecurity
+        $msg = preg_replace("/\r\n/","&#xD;&#xA;", $msg);
 
         $document = new DOMDocument();
         $document->loadXML($msg);
