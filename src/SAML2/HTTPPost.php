@@ -65,9 +65,8 @@ class SAML2_HTTPPost extends SAML2_Binding
             throw new Exception('Missing SAMLRequest or SAMLResponse parameter.');
         }
 
+        SAML2_Utils::getContainer()->debugMessage($msg, 'in.base64');
         $msg = base64_decode($msg);
-
-
         SAML2_Utils::getContainer()->debugMessage($msg, 'in');
 
 	
